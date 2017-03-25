@@ -1,0 +1,37 @@
+{
+  "name": "lib32100",
+  "version": "1.0.0",
+  "description": "Library implementing port 32100 UDP Cloud protocol",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/eslint *.js lib/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fbertone/lib32100.git"
+  },
+  "keywords": [
+    "cloud",
+    "32100",
+    "P2P",
+    "cam",
+    "camera",
+    "IP",
+    "UDP",
+    "IoT"
+  ],
+  "author": "Fabrizio Bertone",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fbertone/lib32100/issues"
+  },
+  "homepage": "https://github.com/fbertone/lib32100#readme",
+  "devDependencies": {
+    "eslint": "^3.18.0",
+    "eslint-config-standard": "^7.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-node": "^4.2.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.1.1"
+  }
+}
