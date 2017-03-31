@@ -1,6 +1,6 @@
 const dgram = require('dgram')
 const EventEmitter = require('events')
-const util = require('util')
+// const util = require('util')
 
 const camClient = require('./lib/camClient')
 const cloudClient = require('./lib/cloudClient')
@@ -10,7 +10,17 @@ const client = function client (opts = {}, udpSocket) {
   let servers = opts.servers ? opts.servers : []
   let uid = opts.uid ? opts.uid : ''
   let camAddresses = opts.camDirectAddresses ? opts.camDirectAddresses : []
+  let camCredentials = opts.credentials ? opts.credentials : {user: 'admin', pass: ''}
   let emitter = new EventEmitter()
+  let currentCamSession = {
+    init: false,
+    active: false,
+    address: {host: null, port: null},
+    mySeq: 0,
+    lastACK: null,
+    lastRemoteSeq: null,
+    lastRemoteACKed: null
+  }
 
   if (udpSocket) {
     socket = udpSocket
@@ -24,7 +34,13 @@ const client = function client (opts = {}, udpSocket) {
       if (addressExists(servers, {host: rinfo.address, port: rinfo.port})) {
         cloudClient.parseMessage(msg, (type, info) => { emitter.emit(type, info) })
       } else if (addressExists(camAddresses, {host: rinfo.address, port: rinfo.port})) {
-        camClient.parseMessage(msg, (type, info) => { emitter.emit(type, info) })
+        camClient.parseMessage(msg, (type, info) => {
+          emitter.emit(type, info)
+          if ((type === 'pingpong') && (info.subtype === 'ping')) {
+            // keep the session alive
+            camClient.sendPong(socket, {host: rinfo.address, port: rinfo.port})
+          }
+        })
       } else { // unknown sender
 
       }
@@ -34,6 +50,16 @@ const client = function client (opts = {}, udpSocket) {
     if (!addressExists(servers, address)) {
       servers.push(address)
     }
+  }
+
+  const addCamAddress = function addCamAddress (address) {
+    if (!addressExists(camAddresses, address)) {
+      camAddresses.push(address)
+    }
+  }
+
+  const setCamCredentials = function setCamCredentials (credentials) {
+    camCredentials = credentials
   }
 
   const setUid = function setUid (newUid) {
@@ -51,6 +77,34 @@ const client = function client (opts = {}, udpSocket) {
     servers.forEach((address) => { cloudClient.lookupUid(socket, address, uidToCheck) })
   }
 
+  const openDirectCamSession = function openDirectCamSession (address) {
+    currentCamSession.init = true
+    addCamAddress(address)
+    currentCamSession.address = address
+    camClient.openSession(socket, address, uid)
+  }
+
+  const closeCamSession = function closeCamSession () {
+    camClient.closeSession(socket, currentCamSession.address)
+  }
+
+  const checkCredentials = function checkCredentials () {
+    camClient.checkCredentials(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const sendMultipleGet = function sendMultipleGet (urls) {
+    // TOTO check request length and eventually split in multiple requests
+    camClient.sendMultipleGet(socket, currentCamSession.address, currentCamSession.mySeq, urls)
+    currentCamSession.mySeq++
+  }
+
+// TODO: add authentication parameters
+  const sendGet = function sendGet (url) {
+    camClient.sendGet(socket, currentCamSession.address, currentCamSession.mySeq, url)
+    currentCamSession.mySeq++
+  }
+
   const on = function on (ev, cb) {
     emitter.addListener(ev, cb)
   }
@@ -60,13 +114,16 @@ const client = function client (opts = {}, udpSocket) {
     setUid,
     sendSTUNRequest,
     lookupUid,
+    setCamCredentials,
+    addCamAddress,
+    openDirectCamSession,
+    closeCamSession,
+    checkCredentials,
+    sendMultipleGet,
+    sendGet,
     on
   }
 }
-
-//  TODO check EventEmitter
-
-util.inherits(client, EventEmitter)
 
 const addressExists = function addressExists (arr, address) {
   return arr.some(function (el) {
