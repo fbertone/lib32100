@@ -8,7 +8,7 @@ const cloudClient = require('./lib/cloudClient')
 const client = function client (opts = {}, udpSocket) {
   let socket
   let servers = opts.servers ? opts.servers : []
-  let uid = opts.uid ? opts.uid : ''
+  let uid = opts.uid ? opts.uid.replace(/-/g, '') : ''
   let camAddresses = opts.camDirectAddresses ? opts.camDirectAddresses : []
   let camCredentials = opts.credentials ? opts.credentials : {user: 'admin', pass: ''}
   let emitter = new EventEmitter()
@@ -42,7 +42,7 @@ const client = function client (opts = {}, udpSocket) {
           }
         })
       } else { // unknown sender
-
+        emitter.emit('unknownSender', JSON.stringify(rinfo) + ' - ' + msg.toString('hex') )
       }
     })
 
@@ -63,7 +63,7 @@ const client = function client (opts = {}, udpSocket) {
   }
 
   const setUid = function setUid (newUid) {
-    uid = newUid
+    uid = newUid.replace(/-/g, '')
   }
 
   const sendSTUNRequest = function sendSTUNRequest () {
@@ -73,8 +73,16 @@ const client = function client (opts = {}, udpSocket) {
   const lookupUid = function lookupUid (uidToCheck) {
     if (!uidToCheck) {
       uidToCheck = uid
+    } else {
+      uidToCheck = uidToCheck.replace(/-/g, '')
     }
-    servers.forEach((address) => { cloudClient.lookupUid(socket, address, uidToCheck) })
+    servers.forEach((address) => {
+      cloudClient.lookupUid(socket, address, uidToCheck, (error) => {
+        if (error) {
+          emitter.emit('error', error)
+        }
+      })
+    })
   }
 
   const openDirectCamSession = function openDirectCamSession (address) {
@@ -90,6 +98,11 @@ const client = function client (opts = {}, udpSocket) {
 
   const checkCredentials = function checkCredentials () {
     camClient.checkCredentials(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getSnapshot = function getSnapshot () {
+    camClient.getSnapshot(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
     currentCamSession.mySeq++
   }
 
@@ -121,6 +134,7 @@ const client = function client (opts = {}, udpSocket) {
     checkCredentials,
     sendMultipleGet,
     sendGet,
+    getSnapshot,
     on
   }
 }

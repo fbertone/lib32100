@@ -1,4 +1,4 @@
-[npm-image]: https://img.shields.io/badge/npm-v1.1.0-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v1.2.0-blue.svg
 [npm-url]: https://npmjs.org/package/lib32100
 [![npm][npm-image]][npm-url]
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
@@ -6,6 +6,7 @@
 
 # lib32100
 Library implementing port 32100 UDP Cloud protocol used by many P2P cameras.
+You can find a description of the protocol in the [wiki](https://github.com/fbertone/lib32100/wiki)
 
 ## Install
 
