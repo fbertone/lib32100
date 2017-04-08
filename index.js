@@ -48,7 +48,6 @@ const client = function client (opts = {}, udpSocket) {
 
   const addServer = function addServer (address) {
     if (!address || !address.host || !address.port) {
-      return
     } else {
       if (!addressExists(servers, address)) {
         servers.push(address)
@@ -58,7 +57,6 @@ const client = function client (opts = {}, udpSocket) {
 
   const addCamAddress = function addCamAddress (address) {
     if (!address || !address.host || !address.port) {
-      return
     } else {
       if (!addressExists(camAddresses, address)) {
         camAddresses.push(address)
@@ -126,6 +124,10 @@ const client = function client (opts = {}, udpSocket) {
     currentCamSession.mySeq++
   }
 
+  const sendPing = function sendPing () {
+    camClient.sendPing(socket, currentCamSession.address)
+  }
+
   const on = function on (ev, cb) {
     emitter.addListener(ev, cb)
   }
@@ -143,6 +145,7 @@ const client = function client (opts = {}, udpSocket) {
     sendMultipleGet,
     sendGet,
     getSnapshot,
+    sendPing,
     on
   }
 }
