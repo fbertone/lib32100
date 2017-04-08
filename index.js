@@ -42,19 +42,27 @@ const client = function client (opts = {}, udpSocket) {
           }
         })
       } else { // unknown sender
-        emitter.emit('unknownSender', JSON.stringify(rinfo) + ' - ' + msg.toString('hex') )
+        emitter.emit('unknownSender', JSON.stringify(rinfo) + ' - ' + msg.toString('hex'))
       }
     })
 
   const addServer = function addServer (address) {
-    if (!addressExists(servers, address)) {
-      servers.push(address)
+    if (!address || !address.host || !address.port) {
+      return
+    } else {
+      if (!addressExists(servers, address)) {
+        servers.push(address)
+      }
     }
   }
 
   const addCamAddress = function addCamAddress (address) {
-    if (!addressExists(camAddresses, address)) {
-      camAddresses.push(address)
+    if (!address || !address.host || !address.port) {
+      return
+    } else {
+      if (!addressExists(camAddresses, address)) {
+        camAddresses.push(address)
+      }
     }
   }
 
