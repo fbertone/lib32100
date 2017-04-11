@@ -1,7 +1,5 @@
 const dgram = require('dgram')
 const EventEmitter = require('events')
-// const util = require('util')
-
 const camClient = require('./lib/camClient')
 const cloudClient = require('./lib/cloudClient')
 
@@ -13,17 +11,19 @@ const client = function client (opts = {}, udpSocket) {
   let camCredentials = opts.credentials ? opts.credentials : {user: 'admin', pass: ''}
   let emitter = new EventEmitter()
   let currentBuffer = Buffer.from([])
+  let pingNum = 0
   let currentCamSession = {
     init: false,
     active: false,
     address: {host: null, port: null},
     mySeq: 0,
     lastACK: null,
-    lastRemoteSeq: null,
     lastRemoteACKed: null,
     lastTimeReceivedPacket: null,
-    remoteSeqs: [],
-    pingerId: null,
+    remoteHttpSeqs: [],
+    remoteAudioSeqs: [],
+    remoteVideoSeqs: [],
+//    pingerId: null,
     ackerId: null,
     receivedIds: 0,
     receivedFirstPacket: false,
@@ -38,6 +38,8 @@ const client = function client (opts = {}, udpSocket) {
     socket.bind()
   }
 
+  // TODO better buffer handling (deal with ordered sequence numbers, packet repetitions and packet losses)
+
   socket.on('message',
     function (msg, rinfo) { // check if message is from a server or the camera
       if (addressExists(servers, {host: rinfo.address, port: rinfo.port})) {
@@ -51,40 +53,64 @@ const client = function client (opts = {}, udpSocket) {
             camClient.sendPong(socket, {host: rinfo.address, port: rinfo.port})
           } else if ((type === 'confirmed') && (!currentCamSession.active)) {
             currentCamSession.active = true
-            currentCamSession.receivedIds++
-            camClient.openSession(socket, {host: rinfo.address, port: rinfo.port}, uid)
+            camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
+//            currentCamSession.receivedIds++
+//            camClient.openSession(socket, {host: rinfo.address, port: rinfo.port}, uid)
 //            camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
-            currentCamSession.pingerId = setInterval(() => {
-              camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
-              let now = Date.now()
-              let past = now - currentCamSession.lastTimeReceivedPacket
-              if (past > 10000) {
-                emitter.emit('lostConnection', {lastReceived: currentCamSession.lastTimeReceivedPacket, timePast: past, message: `not receiving packets since ${past / 1000} seconds`})
+            // currentCamSession.pingerId = setInterval(() => {
+            //   camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
+            //   let now = Date.now()
+            //   let past = now - currentCamSession.lastTimeReceivedPacket
+            //   if (past > 10000) {
+            //     emitter.emit('lostConnection', {lastReceived: currentCamSession.lastTimeReceivedPacket, timePast: past, message: `not receiving packets since ${past / 1000} seconds`})
+            //   }
+            // }, 1000)
+            currentCamSession.ackerId = setInterval(() => { // either send acks or pings
+              if (currentCamSession.remoteHttpSeqs.length > 0 || currentCamSession.remoteAudioSeqs.length > 0 || currentCamSession.remoteVideoSeqs.length > 0) {
+                if (currentCamSession.remoteHttpSeqs.length > 0) {
+                  camClient.sendHttpAck(socket, {host: rinfo.address, port: rinfo.port}, currentCamSession.remoteHttpSeqs)
+                  currentCamSession.remoteHttpSeqs = []
+                }
+                if (currentCamSession.remoteAudioSeqs.length > 0) {
+                  camClient.sendAudioAck(socket, {host: rinfo.address, port: rinfo.port}, currentCamSession.remoteAudioSeqs)
+                  currentCamSession.remoteAudioSeqs = []
+                }
+                if (currentCamSession.remoteVideoSeqs.length > 0) {
+                  camClient.sendVideoAck(socket, {host: rinfo.address, port: rinfo.port}, currentCamSession.remoteVideoSeqs)
+                  currentCamSession.remoteVideoSeqs = []
+                }
+              } else { // NOTE: don't send ping BEFORE sending acks or the camera will think the packets not yet acket got lost
+                if (pingNum === 0) {
+                  camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
+                  let now = Date.now()
+                  let past = now - currentCamSession.lastTimeReceivedPacket
+                  if (past > 10000) {
+                    emitter.emit('lostConnection', {lastReceived: currentCamSession.lastTimeReceivedPacket, timePast: past, message: `not receiving packets since ${past / 1000} seconds`})
+                  }
+                }
               }
-            }, 1000)
-            currentCamSession.ackerId = setInterval(() => {
-              camClient.sendAck(socket, {host: rinfo.address, port: rinfo.port}, currentCamSession.remoteSeqs)
-              currentCamSession.remoteSeqs = []
+              // limiting the rate of pings sent
+              pingNum++
+              if (pingNum === 20) {
+                pingNum = 0
+              }
             }, 50)
-          } else if ((type === 'confirmed') && (currentCamSession.active)) {
-            currentCamSession.receivedIds++
-            if (currentCamSession.receivedIds < 4) {
-              camClient.openSession(socket, {host: rinfo.address, port: rinfo.port}, uid)
-            } else {
-              camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
-            }
+          // } else if ((type === 'confirmed') && (currentCamSession.active)) {
+          //   currentCamSession.receivedIds++
+          //   if (currentCamSession.receivedIds < 4) {
+          //     camClient.openSession(socket, {host: rinfo.address, port: rinfo.port}, uid)
+          //   } else {
+          //     camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
+          //   }
           } else if ((type === 'close') && (currentCamSession.active)) {
             cleanUpSession()
           } else if (type === 'http') {
-            currentCamSession.remoteSeqs.push(info.seq)
-            if (!currentCamSession.lastRemoteSeq || currentCamSession.lastRemoteSeq < info.seq) {
-              currentCamSession.lastRemoteSeq = info.seq
-            }
+            currentCamSession.remoteHttpSeqs.push(info.seq)
             if (!currentCamSession.receivedFirstPacket) {
               currentCamSession.receivedFirstPacket = true
               currentCamSession.receivedBytes = msg.length - 16
               camClient.parseHttp(msg, (info) => {
-                console.log('bytes to expect: ' + info.size)
+//                console.log('bytes to expect: ' + info.size)
                 currentCamSession.bytesToReceive = info.size
                 currentBuffer = info.payload
                 if (info.size === currentCamSession.receivedBytes) {
@@ -104,6 +130,10 @@ const client = function client (opts = {}, udpSocket) {
                 currentCamSession.bytesToReceive = 0
               }
             }
+          } else if (type === 'audio') {
+            currentCamSession.remoteAudioSeqs.push(info.seq)
+          } else if (type === 'video') {
+            currentCamSession.remoteVideoSeqs.push(info.seq)
           }
         })
       } else { // unknown sender
@@ -168,6 +198,8 @@ const client = function client (opts = {}, udpSocket) {
     cleanUpSession()
   }
 
+  // TODO: assign to each request an id and a buffer, return the buffer when the response is complete
+
   const checkCredentials = function checkCredentials () {
     camClient.checkCredentials(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
     currentCamSession.mySeq++
@@ -201,9 +233,9 @@ const client = function client (opts = {}, udpSocket) {
   // TODO
   function cleanUpSession () {
     currentCamSession.active = false
-    if (currentCamSession.pingerId) {
-      clearInterval(currentCamSession.pingerId)
-    }
+    // if (currentCamSession.pingerId) {
+    //   clearInterval(currentCamSession.pingerId)
+    // }
     if (currentCamSession.ackerId) {
       clearInterval(currentCamSession.ackerId)
     }
