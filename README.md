@@ -64,6 +64,51 @@ Open direct camera session
 client.openDirectCamSession({host: "192.168.0.100", port: 10088})
 ```
 
+Check credentials
+```javascript
+client.checkCredentials()
+```
+
+Get snapshot
+```javascript
+client.getSnapshot()
+```
+
+Send custom GET request
+```javascript
+client.sendGet('/custom_url.cgi?myparam=hello')
+```
+
+Send multiple GET requests
+```javascript
+client.sendMultipleGet(['/custom_url1.cgi', '/custom_url2.cgi', '/custom_url3.cgi'])
+```
+
+Get live video stream
+```javascript
+client.getVideoStream()
+```
+
+Get live audio stream
+```javascript
+client.getAudioStream()
+```
+
+Stop video stream
+```javascript
+client.stopVideoStream()
+```
+
+Stop audio stream
+```javascript
+client.stopAudioStream()
+```
+
+Close session
+```javascript
+client.closeCamSession()
+```
+
 ### Events
 
 You can listen on the following events:
@@ -77,6 +122,10 @@ close (camera closed session)
 confirmed (camera comfirmed ID i.e. session opened)
 ack (camera acked a message)
 http (an http response)
+audio (live audio data)
+video (live video data)
+complete (a complete http response)
+lostConnection (the connection was lost)
 ```
 
 ## TODO
@@ -92,6 +141,7 @@ http (an http response)
 - [ ] verify send acks and correct sequence numbers
 - [ ] add callbacks / promises
 - [ ] authenticated http requests
+- [ ] send audio to the camera
 - [ ] implement server
 - [ ] emulate camera
 
