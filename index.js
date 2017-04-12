@@ -39,6 +39,12 @@ const client = function client (opts = {}, udpSocket) {
   }
 
   // TODO better buffer handling (deal with ordered sequence numbers, packet repetitions and packet losses)
+  // create a 'buffer' object and put packets as properties using seq as key.
+  // when a message is complete remove all parts and return complete
+
+  // TODO deal with retransmission of our packets lost during transmission
+  // -> must check remote acks and pings
+  // -> must keep a cache of our packets
 
   socket.on('message',
     function (msg, rinfo) { // check if message is from a server or the camera
@@ -84,7 +90,7 @@ const client = function client (opts = {}, udpSocket) {
                   camClient.sendPing(socket, {host: rinfo.address, port: rinfo.port})
                   let now = Date.now()
                   let past = now - currentCamSession.lastTimeReceivedPacket
-                  if (past > 10000) {
+                  if (past > 10000) { // TODO should send close message and reset the connection at this point
                     emitter.emit('lostConnection', {lastReceived: currentCamSession.lastTimeReceivedPacket, timePast: past, message: `not receiving packets since ${past / 1000} seconds`})
                   }
                 }
@@ -222,6 +228,26 @@ const client = function client (opts = {}, udpSocket) {
     currentCamSession.mySeq++
   }
 
+  const getAudioStream = function getAudioStream (stream = 1) {
+    camClient.getAudioStream(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials, stream)
+    currentCamSession.mySeq++
+  }
+
+  const getVideoStream = function getVideoStream (stream = 10) {
+    camClient.getVideoStream(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials, stream)
+    currentCamSession.mySeq++
+  }
+
+  const stopAudioStream = function stopAudioStream () {
+    camClient.stopAudioStream(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const stopVideoStream = function stopVideoStream () {
+    camClient.stopVideoStream(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
   const sendPing = function sendPing () {
     camClient.sendPing(socket, currentCamSession.address)
   }
@@ -254,6 +280,10 @@ const client = function client (opts = {}, udpSocket) {
     sendMultipleGet,
     sendGet,
     getSnapshot,
+    getAudioStream,
+    getVideoStream,
+    stopAudioStream,
+    stopVideoStream,
     sendPing,
     on
   }

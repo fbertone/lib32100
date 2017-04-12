@@ -1,3 +1,18 @@
+# 1.2.0 (2017-04-12)
+
+### Features
+
+* **client:** (*camera*) Get snapshot
+* **client:** (*camera*) Get video stream
+* **client:** (*camera*) Stop video stream
+* **client:** (*camera*) Get audio stream
+* **client:** (*camera*) Stop audio stream
+
+### Enhancements
+
+* **client:** (*camera*) Better handling of pings
+* **client:** (*camera*) Acks sending for responses, video and audio packets
+
 # 1.1.0 (2017-03-31)
 
 ### Features
