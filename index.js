@@ -1,3 +1,4 @@
+'use strict'
 const dgram = require('dgram')
 const EventEmitter = require('events')
 const camClient = require('./lib/camClient')
@@ -248,9 +249,69 @@ const client = function client (opts = {}, udpSocket) {
     currentCamSession.mySeq++
   }
 
-  const sendPing = function sendPing () {
-    camClient.sendPing(socket, currentCamSession.address)
+  const getParams = function getParams () {
+    camClient.getParams(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
   }
+
+  const getStatus = function getStatus () {
+    camClient.getStatus(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const cameraControl = function cameraControl () {
+    camClient.cameraControl(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getMisc = function getMisc () {
+    camClient.getMisc(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getRtsp = function getRtsp () {
+    camClient.getRtsp(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getOnvif = function getOnvif () {
+    camClient.getOnvif(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getRecord = function getRecord () {
+    camClient.getRecord(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const wifiScan = function wifiScan () {
+    camClient.wifiScan(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getWifiScanResult = function getWifiScanResult () {
+    camClient.getWifiScanResult(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const login = function login () {
+    camClient.login(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getCameraParams = function getCameraParams () {
+    camClient.getCameraParams(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const getFactoryParam = function getFactoryParam () {
+    camClient.getFactoryParam(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  // const sendPing = function sendPing () {
+  //   camClient.sendPing(socket, currentCamSession.address)
+  // }
 
   const on = function on (ev, cb) {
     emitter.addListener(ev, cb)
@@ -284,7 +345,18 @@ const client = function client (opts = {}, udpSocket) {
     getVideoStream,
     stopAudioStream,
     stopVideoStream,
-    sendPing,
+    getParams,
+    getCameraParams,
+    getFactoryParam,
+    getStatus,
+    cameraControl,
+    getMisc,
+    login,
+    getRtsp,
+    getOnvif,
+    getRecord,
+    wifiScan,
+    getWifiScanResult,
     on
   }
 }
