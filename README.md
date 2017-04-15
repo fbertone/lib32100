@@ -1,4 +1,4 @@
-[npm-image]: https://img.shields.io/badge/npm-v1.2.0-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v1.3.0-blue.svg
 [npm-url]: https://npmjs.org/package/lib32100
 [![npm][npm-image]][npm-url]
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
@@ -102,6 +102,22 @@ client.stopVideoStream()
 Stop audio stream
 ```javascript
 client.stopAudioStream()
+```
+
+Get various information
+```javascript
+client.getParams()
+client.getCameraParams()
+client.getFactoryParam()
+client.getStatus()
+client.cameraControl()
+client.getMisc()
+client.login()
+client.getRtsp()
+client.getOnvif()
+client.getRecord()
+client.wifiScan()
+client.getWifiScanResult()
 ```
 
 Close session

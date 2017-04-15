@@ -1,3 +1,20 @@
+# 1.3.0 (2017-04-15)
+
+### Features
+
+* **client:** (*camera*) getParams
+* **client:** (*camera*) getCameraParams
+* **client:** (*camera*) getFactoryParam
+* **client:** (*camera*) getStatus
+* **client:** (*camera*) cameraControl
+* **client:** (*camera*) getMisc
+* **client:** (*camera*) login
+* **client:** (*camera*) getRtsp
+* **client:** (*camera*) getOnvif
+* **client:** (*camera*) getRecord
+* **client:** (*camera*) wifiScan
+* **client:** (*camera*) getWifiScanResult
+
 # 1.2.0 (2017-04-12)
 
 ### Features
