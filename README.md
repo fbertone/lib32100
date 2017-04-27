@@ -1,4 +1,4 @@
-[npm-image]: https://img.shields.io/badge/npm-v1.3.0-blue.svg
+[npm-image]: https://img.shields.io/badge/npm-v1.4.0-blue.svg
 [npm-url]: https://npmjs.org/package/lib32100
 [![npm][npm-image]][npm-url]
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
@@ -118,6 +118,23 @@ client.getOnvif()
 client.getRecord()
 client.wifiScan()
 client.getWifiScanResult()
+```
+
+Move in directions in steps
+```javascript
+client.stepDown()
+client.stepLeft()
+client.stepRight()
+client.stepUp()
+```
+
+Move in directions
+```javascript
+client.moveDown()
+client.moveLeft()
+client.moveRight()
+client.moveUp()
+client.stopMove()
 ```
 
 Close session

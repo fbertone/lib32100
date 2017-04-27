@@ -1,3 +1,17 @@
+# 1.4.0 (2017-04-27)
+
+### Features
+
+* **client:** (*camera*) stepDown
+* **client:** (*camera*) stepLeft
+* **client:** (*camera*) stepRight
+* **client:** (*camera*) stepUp
+* **client:** (*camera*) moveDown
+* **client:** (*camera*) moveLeft
+* **client:** (*camera*) moveRight
+* **client:** (*camera*) moveUp
+* **client:** (*camera*) stopMove
+
 # 1.3.0 (2017-04-15)
 
 ### Features

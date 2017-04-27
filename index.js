@@ -313,6 +313,51 @@ const client = function client (opts = {}, udpSocket) {
   //   camClient.sendPing(socket, currentCamSession.address)
   // }
 
+  const moveDown = function moveDown () {
+    camClient.moveDown(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const moveLeft = function moveLeft () {
+    camClient.moveLeft(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const moveRight = function moveRight () {
+    camClient.moveRight(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const moveUp = function moveUp () {
+    camClient.moveUp(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const stepDown = function stepDown () {
+    camClient.stepDown(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const stepLeft = function stepLeft () {
+    camClient.stepLeft(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const stepRight = function stepRight () {
+    camClient.stepRight(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const stepUp = function stepUp () {
+    camClient.stepUp(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const stopMove = function stopMove () {
+    camClient.stopMove(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
   const on = function on (ev, cb) {
     emitter.addListener(ev, cb)
   }
@@ -357,6 +402,15 @@ const client = function client (opts = {}, udpSocket) {
     getRecord,
     wifiScan,
     getWifiScanResult,
+    moveDown,
+    moveLeft,
+    moveRight,
+    moveUp,
+    stepDown,
+    stepLeft,
+    stepRight,
+    stepUp,
+    stopMove,
     on
   }
 }
