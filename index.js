@@ -358,6 +358,26 @@ const client = function client (opts = {}, udpSocket) {
     currentCamSession.mySeq++
   }
 
+  const moveDownLeft = function moveDownLeft () {
+    camClient.moveDownLeft(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const moveDownRight = function moveDownRight () {
+    camClient.moveDownRight(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const moveUpLeft = function moveUpLeft () {
+    camClient.moveUpLeft(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
+  const moveUpRight = function moveUpRight () {
+    camClient.moveUpRight(socket, currentCamSession.address, currentCamSession.mySeq, camCredentials)
+    currentCamSession.mySeq++
+  }
+
   const on = function on (ev, cb) {
     emitter.addListener(ev, cb)
   }
@@ -411,6 +431,10 @@ const client = function client (opts = {}, udpSocket) {
     stepRight,
     stepUp,
     stopMove,
+    moveDownRight,
+    moveUpRight,
+    moveUpLeft,
+    moveDownLeft,
     on
   }
 }

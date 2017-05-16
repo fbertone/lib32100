@@ -1,6 +1,4 @@
-[npm-image]: https://img.shields.io/badge/npm-v1.4.0-blue.svg
-[npm-url]: https://npmjs.org/package/lib32100
-[![npm][npm-image]][npm-url]
+[![npm](https://img.shields.io/npm/v/lib32100.svg)](https://npmjs.org/package/lib32100)
 [![Standard - JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 

@@ -1,3 +1,12 @@
+# 1.5.0 (2017-05-16)
+
+### Features
+
+* **client:** (*camera*) moveDownLeft
+* **client:** (*camera*) moveDownRight
+* **client:** (*camera*) moveUpLeft
+* **client:** (*camera*) moveUpRight
+
 # 1.4.0 (2017-04-27)
 
 ### Features
