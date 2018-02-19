@@ -180,6 +180,7 @@ lostConnection (the connection was lost)
 - [ ] send audio to the camera
 - [ ] implement server
 - [ ] emulate camera
+- [ ] translate stream to RTP
 
 ## DISCLAIMER
 This implementation is not based on official specs but purely on reverse engineering of the protocol.
