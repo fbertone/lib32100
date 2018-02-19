@@ -6,6 +6,11 @@
 Library implementing port 32100 UDP Cloud protocol used by many P2P cameras.
 You can find a description of the protocol in the [wiki](https://github.com/fbertone/lib32100/wiki)
 
+## News
+* Check my new [Wireshark dissector](https://github.com/fbertone/32100-dissector) to analyze the protocol
+* Warning: since the commands directed to cams turnedo out to be vendor-specific, they will be deprecated and afterwards removed in next major release,
+keeping just the transport protocol in core lib and leaving higher-level payload interpretation to specific client implementation. 
+
 ## Install
 
 ```bash
